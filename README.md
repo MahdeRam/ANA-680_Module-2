@@ -1,4 +1,4 @@
-Heroku URL: http://127.0.0.1:5000/
+Heroku URL: https://ana680-midterm-56c964b5b146.herokuapp.com/
 
 
 This is the hands-on part of the midterm. You are asked to train and build a machine learning model using GitHub Actions for CI/CD deployment on Heroku.
