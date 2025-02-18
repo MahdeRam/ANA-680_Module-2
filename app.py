@@ -1,29 +1,34 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import joblib
 import numpy as np
 
-app = Flask(__name__)
-
-# Load trained model and label encoder
+# Load the trained model and label encoder
 model = joblib.load("student_model.pkl")
 label_encoder = joblib.load("label_encoder.pkl")
 
+app = Flask(__name__)
+
 @app.route('/')
 def home():
-    return "Welcome to the Student Performance Prediction API!"
+    return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    data = request.json
-    math_score = data["math"]
-    reading_score = data["reading"]
-    writing_score = data["writing"]
+    try:
+        # Get input values from the form
+        math_score = float(request.form['math_score'])
+        reading_score = float(request.form['reading_score'])
+        writing_score = float(request.form['writing_score'])
 
-    features = np.array([[math_score, reading_score, writing_score]])
-    prediction = model.predict(features)
-    predicted_label = label_encoder.inverse_transform(prediction)[0]
+        # Prepare data for prediction
+        input_data = np.array([[math_score, reading_score, writing_score]])
+        prediction = model.predict(input_data)[0]
+        predicted_label = label_encoder.inverse_transform([prediction])[0]
 
-    return jsonify({"Predicted Race/Ethnicity": predicted_label})
+        return render_template('index.html', prediction=predicted_label)
+    except Exception as e:
+        return render_template('index.html', prediction="Error: " + str(e))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
